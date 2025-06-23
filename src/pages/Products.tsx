@@ -1,17 +1,17 @@
-
 import { useState } from 'react';
 import { Search, ShoppingCart, Heart, User, Star, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from 'react-router-dom';
+import SearchBar from '@/components/SearchBar';
 
 const Products = () => {
   const [cartCount, setCartCount] = useState(0);
   const [likedItems, setLikedItems] = useState<Set<number>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const allProducts = [
     {
@@ -88,9 +88,12 @@ const Products = () => {
     }
   ];
 
-  const filteredProducts = allProducts.filter(product => 
-    selectedCategory === 'all' || product.category === selectedCategory
-  );
+  const filteredProducts = allProducts.filter(product => {
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
@@ -113,6 +116,10 @@ const Products = () => {
       newLikedItems.add(productId);
     }
     setLikedItems(newLikedItems);
+    
+    // Save to localStorage (in real app, this would be in context)
+    const likedIds = Array.from(newLikedItems);
+    localStorage.setItem('likedProducts', JSON.stringify(likedIds));
   };
 
   const addToCart = (productId: number) => {
@@ -145,22 +152,26 @@ const Products = () => {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="relative">
-                <Heart className="w-5 h-5" />
-                {likedItems.size > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {likedItems.size}
-                  </span>
-                )}
-              </Button>
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Button>
+              <Link to="/likes">
+                <Button variant="ghost" size="icon" className="relative">
+                  <Heart className="w-5 h-5" />
+                  {likedItems.size > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {likedItems.size}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+              <Link to="/cart">
+                <Button variant="ghost" size="icon" className="relative">
+                  <ShoppingCart className="w-5 h-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
               <Button variant="ghost" size="icon">
                 <User className="w-5 h-5" />
               </Button>
@@ -173,20 +184,26 @@ const Products = () => {
       <section className="py-12 bg-gradient-to-r from-orange-600 to-red-600 text-white">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold text-center mb-4">Our Products</h1>
-          <p className="text-center text-xl opacity-90">Discover our delicious selection of cakes and fast food</p>
+          <p className="text-center text-xl opacity-90 mb-8">Discover our delicious selection of cakes and fast food</p>
+          
+          {/* Enhanced Search Bar */}
+          <SearchBar 
+            onSearch={setSearchQuery}
+            placeholder="Search for cakes, burgers, combos..."
+            className="max-w-3xl"
+          />
         </div>
       </section>
 
-      {/* Filters and Search */}
+      {/* Filters */}
       <section className="py-8 bg-white shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input 
-                placeholder="Search products..." 
-                className="pl-10 bg-gray-50 border-gray-200 focus:border-orange-300"
-              />
+            <div className="text-lg font-semibold text-gray-700">
+              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+              {searchQuery && (
+                <span className="text-orange-600 ml-2">for "{searchQuery}"</span>
+              )}
             </div>
             
             <div className="flex gap-4">
@@ -222,55 +239,72 @@ const Products = () => {
       {/* Products Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sortedProducts.map((product) => (
-              <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                <CardContent className="p-0">
-                  <div className="relative overflow-hidden rounded-t-lg">
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                      onClick={() => toggleLike(product.id)}
-                    >
-                      <Heart 
-                        className={`w-5 h-5 ${likedItems.has(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} 
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-16">
+              <Search className="w-24 h-24 mx-auto text-gray-300 mb-4" />
+              <h3 className="text-2xl font-bold text-gray-600 mb-2">No products found</h3>
+              <p className="text-gray-500 mb-6">Try adjusting your search or filters</p>
+              <Button 
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('all');
+                }}
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+              >
+                Clear Filters
+              </Button>
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {sortedProducts.map((product) => (
+                <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                  <CardContent className="p-0">
+                    <div className="relative overflow-hidden rounded-t-lg">
+                      <img 
+                        src={product.image} 
+                        alt={product.name}
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                       />
-                    </Button>
-                  </div>
-                  
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-orange-600 font-medium capitalize">{product.category}</span>
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm text-gray-600 ml-1">{product.rating}</span>
-                      </div>
-                    </div>
-                    
-                    <h4 className="font-semibold text-gray-800 mb-2">{product.name}</h4>
-                    <p className="text-sm text-gray-600 mb-3">{product.description}</p>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold text-orange-600">${product.price}</span>
-                      <Button 
-                        size="sm" 
-                        className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-                        onClick={() => addToCart(product.id)}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+                        onClick={() => toggleLike(product.id)}
                       >
-                        Add to Cart
+                        <Heart 
+                          className={`w-5 h-5 ${likedItems.has(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} 
+                        />
                       </Button>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-orange-600 font-medium capitalize">{product.category}</span>
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm text-gray-600 ml-1">{product.rating}</span>
+                        </div>
+                      </div>
+                      
+                      <h4 className="font-semibold text-gray-800 mb-2">{product.name}</h4>
+                      <p className="text-sm text-gray-600 mb-3">{product.description}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-xl font-bold text-orange-600">${product.price}</span>
+                        <Button 
+                          size="sm" 
+                          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                          onClick={() => addToCart(product.id)}
+                        >
+                          Add to Cart
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

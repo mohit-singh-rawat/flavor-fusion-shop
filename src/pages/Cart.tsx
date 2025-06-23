@@ -1,75 +1,20 @@
 
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Heart, User, Plus, Minus, Trash2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  description: string;
-  quantity: number;
-}
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [likedCount, setLikedCount] = useState(0);
+  const { cartItems, cartCount, updateQuantity, removeFromCart, getTotalPrice } = useCart();
+  const { wishlistCount } = useWishlist();
 
-  // Sample cart items (in real app, this would come from context/state management)
-  const sampleCartItems: CartItem[] = [
-    {
-      id: 1,
-      name: "Chocolate Fantasy Cake",
-      price: 45.99,
-      image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop",
-      category: "cakes",
-      description: "Rich chocolate cake with premium cocoa and cream layers",
-      quantity: 1
-    },
-    {
-      id: 2,
-      name: "Gourmet Burger Combo",
-      price: 12.99,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
-      category: "fastfood",
-      description: "Juicy beef patty with fries and a drink",
-      quantity: 2
-    }
-  ];
-
-  useEffect(() => {
-    // Initialize with sample data (in real app, load from context/localStorage)
-    setCartItems(sampleCartItems);
-  }, []);
-
-  const updateQuantity = (id: number, change: number) => {
-    setCartItems(items =>
-      items.map(item => {
-        if (item.id === id) {
-          const newQuantity = Math.max(0, item.quantity + change);
-          return newQuantity === 0 ? null : { ...item, quantity: newQuantity };
-        }
-        return item;
-      }).filter(Boolean) as CartItem[]
-    );
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems(items => items.filter(item => item.id !== id));
-  };
-
-  const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
-  const getTotalItems = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
+  const deliveryFee = 4.99;
+  const discount = 5.00;
+  const totalPrice = getTotalPrice();
+  const finalTotal = totalPrice + deliveryFee - discount;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -99,9 +44,9 @@ const Cart = () => {
               <Link to="/likes">
                 <Button variant="ghost" size="icon" className="relative">
                   <Heart className="w-5 h-5" />
-                  {likedCount > 0 && (
+                  {wishlistCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {likedCount}
+                      {wishlistCount}
                     </span>
                   )}
                 </Button>
@@ -109,9 +54,9 @@ const Cart = () => {
               <Link to="/cart">
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="w-5 h-5 text-blue-600" />
-                  {getTotalItems() > 0 && (
+                  {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {getTotalItems()}
+                      {cartCount}
                     </span>
                   )}
                 </Button>
@@ -156,7 +101,7 @@ const Cart = () => {
               <div className="lg:col-span-2 space-y-4">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-800">
-                    Cart Items ({getTotalItems()})
+                    Cart Items ({cartCount})
                   </h2>
                   <Link to="/products">
                     <Button variant="outline" className="border-blue-500 text-blue-600 hover:bg-blue-50">
@@ -193,7 +138,7 @@ const Cart = () => {
                                   variant="ghost"
                                   size="icon"
                                   className="w-8 h-8 hover:bg-blue-100"
-                                  onClick={() => updateQuantity(item.id, -1)}
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                 >
                                   <Minus className="w-4 h-4" />
                                 </Button>
@@ -202,7 +147,7 @@ const Cart = () => {
                                   variant="ghost"
                                   size="icon"
                                   className="w-8 h-8 hover:bg-blue-100"
-                                  onClick={() => updateQuantity(item.id, 1)}
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                 >
                                   <Plus className="w-4 h-4" />
                                 </Button>
@@ -216,7 +161,7 @@ const Cart = () => {
                                   variant="ghost"
                                   size="sm"
                                   className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1"
-                                  onClick={() => removeItem(item.id)}
+                                  onClick={() => removeFromCart(item.id)}
                                 >
                                   <Trash2 className="w-4 h-4 mr-1" />
                                   Remove
@@ -239,16 +184,16 @@ const Cart = () => {
                     
                     <div className="space-y-3 mb-4">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Subtotal ({getTotalItems()} items)</span>
-                        <span className="font-semibold">${getTotalPrice().toFixed(2)}</span>
+                        <span className="text-gray-600">Subtotal ({cartCount} items)</span>
+                        <span className="font-semibold">${totalPrice.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Delivery Fee</span>
-                        <span className="font-semibold">$4.99</span>
+                        <span className="font-semibold">${deliveryFee.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-green-600">
                         <span>Discount</span>
-                        <span>-$5.00</span>
+                        <span>-${discount.toFixed(2)}</span>
                       </div>
                     </div>
                     
@@ -256,7 +201,7 @@ const Cart = () => {
                     
                     <div className="flex justify-between text-xl font-bold mb-6">
                       <span>Total</span>
-                      <span className="text-blue-600">${(getTotalPrice() + 4.99 - 5.00).toFixed(2)}</span>
+                      <span className="text-blue-600">${finalTotal.toFixed(2)}</span>
                     </div>
                     
                     <Button className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-lg py-3 mb-3">

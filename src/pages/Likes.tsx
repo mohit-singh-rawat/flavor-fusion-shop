@@ -1,67 +1,26 @@
 
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Heart, User, Star, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useWishlist } from '@/contexts/WishlistContext';
+import { useCart } from '@/contexts/CartContext';
+import { toast } from 'sonner';
 
 const Likes = () => {
-  const [likedProducts, setLikedProducts] = useState<any[]>([]);
-  const [cartCount, setCartCount] = useState(0);
+  const { wishlistItems, wishlistCount, removeFromWishlist } = useWishlist();
+  const { addToCart, cartCount } = useCart();
 
-  // Sample products data (in real app, this would come from context/state management)
-  const allProducts = [
-    {
-      id: 1,
-      name: "Chocolate Fantasy Cake",
-      price: 45.99,
-      image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop",
-      rating: 4.8,
-      category: "cakes",
-      description: "Rich chocolate cake with premium cocoa and cream layers"
-    },
-    {
-      id: 2,
-      name: "Gourmet Burger Combo",
-      price: 12.99,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
-      rating: 4.6,
-      category: "fastfood",
-      description: "Juicy beef patty with fries and a drink"
-    },
-    {
-      id: 3,
-      name: "Strawberry Delight",
-      price: 38.99,
-      image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop",
-      rating: 4.9,
-      category: "cakes",
-      description: "Fresh strawberry cake with cream layers"
-    }
-  ];
-
-  // Load liked products from localStorage (in real app, this would be from context/API)
-  useEffect(() => {
-    const savedLikes = localStorage.getItem('likedProducts');
-    if (savedLikes) {
-      const likedIds = JSON.parse(savedLikes);
-      const liked = allProducts.filter(product => likedIds.includes(product.id));
-      setLikedProducts(liked);
-    }
-  }, []);
-
-  const removeFromLikes = (productId: number) => {
-    const updatedLikes = likedProducts.filter(product => product.id !== productId);
-    setLikedProducts(updatedLikes);
-    
-    // Update localStorage
-    const likedIds = updatedLikes.map(product => product.id);
-    localStorage.setItem('likedProducts', JSON.stringify(likedIds));
-  };
-
-  const addToCart = (productId: number) => {
-    setCartCount(prev => prev + 1);
-    console.log(`Added product ${productId} to cart`);
+  const handleAddToCart = (product: any) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+      description: product.description
+    });
+    toast.success(`${product.name} added to cart!`);
   };
 
   return (
@@ -92,9 +51,9 @@ const Likes = () => {
               <Link to="/likes">
                 <Button variant="ghost" size="icon" className="relative">
                   <Heart className="w-5 h-5 fill-red-500 text-red-500" />
-                  {likedProducts.length > 0 && (
+                  {wishlistCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {likedProducts.length}
+                      {wishlistCount}
                     </span>
                   )}
                 </Button>
@@ -120,7 +79,7 @@ const Likes = () => {
       {/* Page Header */}
       <section className="py-12 bg-gradient-to-r from-pink-600 to-red-600 text-white">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-4">Your Favorites ❤️</h1>
+          <h1 className="text-4xl font-bold text-center mb-4">Your Wishlist ❤️</h1>
           <p className="text-center text-xl opacity-90">Products you've liked and want to remember</p>
         </div>
       </section>
@@ -128,7 +87,7 @@ const Likes = () => {
       {/* Liked Products */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          {likedProducts.length === 0 ? (
+          {wishlistItems.length === 0 ? (
             <div className="text-center py-16">
               <Heart className="w-24 h-24 mx-auto text-gray-300 mb-4" />
               <h3 className="text-2xl font-bold text-gray-600 mb-2">No favorites yet</h3>
@@ -143,12 +102,12 @@ const Likes = () => {
             <>
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-gray-800">
-                  {likedProducts.length} Favorite{likedProducts.length !== 1 ? 's' : ''}
+                  {wishlistCount} Favorite{wishlistCount !== 1 ? 's' : ''}
                 </h2>
               </div>
               
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {likedProducts.map((product) => (
+                {wishlistItems.map((product) => (
                   <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                     <CardContent className="p-0">
                       <div className="relative overflow-hidden rounded-t-lg">
@@ -161,7 +120,10 @@ const Likes = () => {
                           variant="ghost"
                           size="icon"
                           className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                          onClick={() => removeFromLikes(product.id)}
+                          onClick={() => {
+                            removeFromWishlist(product.id);
+                            toast.success(`${product.name} removed from wishlist`);
+                          }}
                         >
                           <Trash2 className="w-5 h-5 text-red-500" />
                         </Button>
@@ -184,7 +146,7 @@ const Likes = () => {
                           <Button 
                             size="sm" 
                             className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600"
-                            onClick={() => addToCart(product.id)}
+                            onClick={() => handleAddToCart(product)}
                           >
                             Add to Cart
                           </Button>

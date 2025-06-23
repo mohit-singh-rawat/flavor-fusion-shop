@@ -1,14 +1,18 @@
+
 import { useState } from 'react';
 import { Search, ShoppingCart, Heart, User, Star, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from 'react-router-dom';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
+import { toast } from 'sonner';
 import SearchBar from '@/components/SearchBar';
 
 const Products = () => {
-  const [cartCount, setCartCount] = useState(0);
-  const [likedItems, setLikedItems] = useState<Set<number>>(new Set());
+  const { addToCart, cartCount } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist, wishlistCount } = useWishlist();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [searchQuery, setSearchQuery] = useState('');
@@ -108,23 +112,26 @@ const Products = () => {
     }
   });
 
-  const toggleLike = (productId: number) => {
-    const newLikedItems = new Set(likedItems);
-    if (newLikedItems.has(productId)) {
-      newLikedItems.delete(productId);
+  const toggleWishlist = (product: any) => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      toast.success(`${product.name} removed from wishlist`);
     } else {
-      newLikedItems.add(productId);
+      addToWishlist(product);
+      toast.success(`${product.name} added to wishlist`);
     }
-    setLikedItems(newLikedItems);
-    
-    // Save to localStorage (in real app, this would be in context)
-    const likedIds = Array.from(newLikedItems);
-    localStorage.setItem('likedProducts', JSON.stringify(likedIds));
   };
 
-  const addToCart = (productId: number) => {
-    setCartCount(prev => prev + 1);
-    console.log(`Added product ${productId} to cart`);
+  const handleAddToCart = (product: any) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+      description: product.description
+    });
+    toast.success(`${product.name} added to cart!`);
   };
 
   return (
@@ -155,9 +162,9 @@ const Products = () => {
               <Link to="/likes">
                 <Button variant="ghost" size="icon" className="relative">
                   <Heart className="w-5 h-5" />
-                  {likedItems.size > 0 && (
+                  {wishlistCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {likedItems.size}
+                      {wishlistCount}
                     </span>
                   )}
                 </Button>
@@ -269,10 +276,10 @@ const Products = () => {
                         variant="ghost"
                         size="icon"
                         className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                        onClick={() => toggleLike(product.id)}
+                        onClick={() => toggleWishlist(product)}
                       >
                         <Heart 
-                          className={`w-5 h-5 ${likedItems.has(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} 
+                          className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} 
                         />
                       </Button>
                     </div>
@@ -294,7 +301,7 @@ const Products = () => {
                         <Button 
                           size="sm" 
                           className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-                          onClick={() => addToCart(product.id)}
+                          onClick={() => handleAddToCart(product)}
                         >
                           Add to Cart
                         </Button>

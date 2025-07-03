@@ -101,3 +101,13 @@
     @apply bg-background text-foreground;
   }
 }
+.account-page {
+  background-image: url("../public/bg-pattern-light.svg") !important; /* Adjust path as needed */
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  width: 100% !important;
+  align-items: center !important;
+  display: flex !important;
+  min-height: 100vh !important;
+}

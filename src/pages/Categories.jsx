@@ -1,17 +1,15 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart, User, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProductAction } from '../redux/products/action';
-import { useCart } from '../contexts/CartContext';
-import { useWishlist } from '../contexts/WishlistContext';
+import '../styles/animations.css';
+
 
 const Categories = () => {
   const dispatch = useDispatch();
-  const { cartCount } = useCart();
-  const { wishlistCount } = useWishlist();
   const { data: products = [] } = useSelector((state) => state.getProducts || {});
   
   useEffect(() => {
@@ -41,7 +39,7 @@ const Categories = () => {
     {
       name: "Combos",
       description: "Perfect combinations for great value",
-      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=600&h=400&fit=crop",
+      image: "https://tb-static.uber.com/prod/image-proc/processed_images/be11e1fa0362b57e465f4311fa0b50ac/8a42ee7a692dfa4155879820804a277f.jpeg",
       count: getProductsByCategory('combos').length,
       products: getProductsByCategory('combos').slice(0, 4).map(p => p.name)
     }
@@ -49,62 +47,18 @@ const Categories = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">🍰</span>
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                  Negi Cake House
-                </h1>
-              </Link>
-            </div>
-            
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Home</Link>
-              <Link to="/products" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Products</Link>
-              <Link to="/categories" className="text-orange-600 font-semibold">Categories</Link>
-              <Link to="/about" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">About</Link>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <Link to="/likes">
-                <Button variant="ghost" size="icon" className="relative">
-                  <Heart className="w-5 h-5" />
-                  {wishlistCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-              <Link to="/cart">
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="w-5 h-5" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-              <Button variant="ghost" size="icon">
-                <User className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Page Header */}
-      <section className="py-12 bg-gradient-to-r from-orange-600 to-red-600 text-white">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-4">Browse Categories</h1>
-          <p className="text-center text-xl opacity-90">Find exactly what you're craving</p>
+      <section className="py-16 bg-gradient-to-r from-orange-600 via-red-500 to-pink-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-40 h-40 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float"></div>
+          <div className="absolute bottom-10 right-10 w-32 h-32 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float animation-delay-300"></div>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <h1 className="text-5xl font-bold text-center mb-4 animate-fade-in-up">
+            Browse <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Categories</span> 🍽️
+          </h1>
+          <p className="text-center text-xl opacity-90 animate-fade-in-up animation-delay-300">Find exactly what you're craving today!</p>
         </div>
       </section>
 
@@ -113,7 +67,7 @@ const Categories = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {categories.map((category, index) => (
-              <Card key={index} className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 overflow-hidden">
+              <Card key={index} className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-6 hover:rotate-2 animate-bounce-in hover-lift overflow-hidden bg-white/90 backdrop-blur-sm border-orange-100" style={{animationDelay: `${index * 200}ms`}}>
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden">
                     <img 
@@ -162,12 +116,16 @@ const Categories = () => {
             Contact us for custom orders or special requests. We're here to make your food dreams come true!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-              Contact Us
-            </Button>
-            <Button size="lg" variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50">
-              View All Products
-            </Button>
+            <Link to="/contact">
+              <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+                Contact Us
+              </Button>
+            </Link>
+            <Link to="/products">
+              <Button size="lg" variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50">
+                View All Products
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

@@ -6,6 +6,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { useToast } from '../components/ui/use-toast';
+import '../styles/animations.css';
+import { isUserAuthenticated } from '../utils/auth';
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -25,6 +27,12 @@ const Register = () => {
   console.log(authState,'authsate')
 
   useEffect(() => {
+    // Check if user is already authenticated
+    if (isUserAuthenticated()) {
+      navigate('/', { replace: true });
+      return;
+    }
+    
     if (authState.isRegistered) {
       toast({
         title: 'Registration Successful',
@@ -55,9 +63,19 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center account-page from-orange-50 to-amber-50">
-      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-bold mb-6 text-center text-orange-600">Create Your Account</h2>
+    <div className="min-h-screen flex items-center justify-center account-page bg-gradient-to-br from-orange-50 via-pink-50 to-amber-50 relative overflow-hidden">
+      <div className="absolute top-10 right-10 w-72 h-72 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+      <div className="absolute bottom-0 left-4 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+      
+      <div className="max-w-md w-full bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-white/20 animate-fade-in-up hover-lift">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-float-slow">
+            <span className="text-white font-bold text-2xl">🎉</span>
+          </div>
+          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600">Join Our Family!</h2>
+          <p className="text-gray-600 mt-2">Create your account to get started</p>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -117,9 +135,9 @@ const Register = () => {
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+            className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
           >
-            Register
+            🎆 Create Account
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">

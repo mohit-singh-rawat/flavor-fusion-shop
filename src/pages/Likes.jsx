@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart, User, Star, Trash2 } from 'lucide-react';
+import { Star, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
+import { useWishlist } from '../contexts/WishlistContext';
+import { useCart } from '../contexts/CartContext';
 
 const Likes = () => {
   const { wishlistItems, wishlistCount, removeFromWishlist } = useWishlist();
@@ -17,67 +19,24 @@ const Likes = () => {
       category: product.category,
       description: product.description
     });
-    toast.success(`${product.name} added to cart!`);
+    toast.success(`${product.name} added to cart!`, { duration: 3000 });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">🍰</span>
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                  Negi Cake House
-                </h1>
-              </Link>
-            </div>
-            
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Home</Link>
-              <Link to="/products" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Products</Link>
-              <Link to="/categories" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Categories</Link>
-              <Link to="/about" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">About</Link>
-            </nav>
 
-            <div className="flex items-center space-x-4">
-              <Link to="/likes">
-                <Button variant="ghost" size="icon" className="relative">
-                  <Heart className="w-5 h-5 fill-red-500 text-red-500" />
-                  {wishlistCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-              <Link to="/cart">
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="w-5 h-5" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-              <Button variant="ghost" size="icon">
-                <User className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Page Header */}
-      <section className="py-12 bg-gradient-to-r from-pink-600 to-red-600 text-white">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-4">Your Wishlist ❤️</h1>
-          <p className="text-center text-xl opacity-90">Products you've liked and want to remember</p>
+      <section className="py-16 bg-gradient-to-r from-pink-600 via-red-500 to-orange-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-40 h-40 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float"></div>
+          <div className="absolute bottom-10 right-10 w-32 h-32 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float animation-delay-300"></div>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <h1 className="text-5xl font-bold text-center mb-4 animate-fade-in-up">
+            Your <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Wishlist</span> ❤️
+          </h1>
+          <p className="text-center text-xl opacity-90 animate-fade-in-up animation-delay-300">Products you've liked and want to remember</p>
         </div>
       </section>
 
@@ -104,8 +63,8 @@ const Likes = () => {
               </div>
               
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {wishlistItems.map((product) => (
-                  <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                {wishlistItems.map((product, index) => (
+                  <Card key={product.id} className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:rotate-1 animate-bounce-in hover-lift" style={{animationDelay: `${index * 100}ms`}}>
                     <CardContent className="p-0">
                       <div className="relative overflow-hidden rounded-t-lg">
                         <img 
@@ -119,7 +78,7 @@ const Likes = () => {
                           className="absolute top-2 right-2 bg-white/80 hover:bg-white"
                           onClick={() => {
                             removeFromWishlist(product.id);
-                            toast.success(`${product.name} removed from wishlist`);
+                            toast.success(`${product.name} removed from wishlist`, { duration: 3000 });
                           }}
                         >
                           <Trash2 className="w-5 h-5 text-red-500" />

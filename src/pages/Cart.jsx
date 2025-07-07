@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, Heart, User, Plus, Minus, Trash2, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
+import '../styles/animations.css';
 import { Separator } from '../components/ui/separator';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
@@ -18,65 +19,22 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">🍰</span>
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                  Negi Cake House
-                </h1>
-              </Link>
-            </div>
-            
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Home</Link>
-              <Link to="/products" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Products</Link>
-              <Link to="/categories" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Categories</Link>
-              <Link to="/about" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">About</Link>
-            </nav>
 
-            <div className="flex items-center space-x-4">
-              <Link to="/likes">
-                <Button variant="ghost" size="icon" className="relative">
-                  <Heart className="w-5 h-5" />
-                  {wishlistCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-              <Link to="/cart">
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="w-5 h-5 text-blue-600" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-              <Button variant="ghost" size="icon">
-                <User className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Page Header */}
-      <section className="py-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center mb-4">
-            <ShoppingCart className="w-8 h-8 mr-3" />
-            <h1 className="text-4xl font-bold">Shopping Cart</h1>
+      <section className="py-16 bg-gradient-to-r from-blue-600 via-purple-500 to-pink-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-40 h-40 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float"></div>
+          <div className="absolute bottom-10 right-10 w-32 h-32 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float animation-delay-300"></div>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex items-center justify-center mb-4 animate-fade-in-up">
+            <ShoppingCart className="w-8 h-8 mr-3 animate-float-slow" />
+            <h1 className="text-5xl font-bold">
+              Shopping <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Cart</span>
+            </h1>
           </div>
-          <p className="text-center text-xl opacity-90">Review your items and proceed to checkout</p>
+          <p className="text-center text-xl opacity-90 animate-fade-in-up animation-delay-300">Review your delicious items and proceed to checkout 🛒</p>
         </div>
       </section>
 

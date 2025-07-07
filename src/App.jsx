@@ -13,15 +13,30 @@ import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Contact from "./pages/Contact";
+import ProductDetail from "./pages/ProductDetail";
+import Navbar from "./components/Navbar";
 import { useSelector } from "react-redux";
+import { isUserAuthenticated } from "./utils/auth";
 
 const queryClient = new QueryClient();
+
+const ConditionalNavbar = () => {
+  const location = useLocation();
+  const hideNavbarPaths = ['/login', '/register'];
+  
+  if (hideNavbarPaths.includes(location.pathname)) {
+    return null;
+  }
+  
+  return <Navbar />;
+};
 
 const PrivateRoute = ({ children }) => {
   const authState = useSelector((state) => state.auth);
   const location = useLocation();
 
-  if (authState.isAuthenticated) {
+  if (authState.isAuthenticated || isUserAuthenticated()) {
     return children;
   } else {
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -33,14 +48,17 @@ const App = () => (
     <CartProvider>
       <WishlistProvider>
         <BrowserRouter>
+          <ConditionalNavbar />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/index" element={<Index />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route
               path="/likes"
               element={

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, ShoppingCart, Heart, User, Star, Filter } from "lucide-react";
+import { Search, Star, Filter, Heart } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import {
@@ -9,15 +9,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import { useWishlist } from "../contexts/WishlistContext";
 import { toast } from "sonner";
 import SearchBar from "../components/SearchBar";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductAction } from "../redux/products/action";
+import '../styles/animations.css';
 
 const Products = () => {
+  const navigate = useNavigate();
   const { addToCart, cartCount } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist, wishlistCount } =
     useWishlist();
@@ -62,14 +64,14 @@ const Products = () => {
     const productId = product.id || product._id;
     if (isInWishlist(productId)) {
       removeFromWishlist(productId);
-      toast.success(`${product.name} removed from wishlist`);
+      toast.success(`${product.name} removed from wishlist`, { duration: 3000 });
     } else {
       addToWishlist({
         ...product,
         id: productId,
         image: product.image || product.imageUrl,
       });
-      toast.success(`${product.name} added to wishlist`);
+      toast.success(`${product.name} added to wishlist`, { duration: 3000 });
     }
   };
 
@@ -82,91 +84,30 @@ const Products = () => {
       category: product.category,
       description: product.description,
     });
-    toast.success(`${product.name} added to cart!`);
+    toast.success(`${product.name} added to cart!`, { duration: 3000 });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">🍰</span>
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                  Negi Cake House
-                </h1>
-              </Link>
-            </div>
-
-            <nav className="hidden md:flex space-x-8">
-              <Link
-                to="/"
-                className="text-gray-700 hover:text-orange-600 transition-colors font-medium"
-              >
-                Home
-              </Link>
-              <Link to="/products" className="text-orange-600 font-semibold">
-                Products
-              </Link>
-              <Link
-                to="/categories"
-                className="text-gray-700 hover:text-orange-600 transition-colors font-medium"
-              >
-                Categories
-              </Link>
-              <Link
-                to="/about"
-                className="text-gray-700 hover:text-orange-600 transition-colors font-medium"
-              >
-                About
-              </Link>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <Link to="/likes">
-                <Button variant="ghost" size="icon" className="relative">
-                  <Heart className="w-5 h-5" />
-                  {wishlistCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-              <Link to="/cart">
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="w-5 h-5" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-              <Button variant="ghost" size="icon">
-                <User className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Page Header */}
-      <section className="py-12 bg-gradient-to-r from-orange-600 to-red-600 text-white">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-4">Our Products</h1>
-          <p className="text-center text-xl opacity-90 mb-8">
-            Discover our delicious selection of cakes and fast food
+      <section className="py-12 bg-gradient-to-r from-orange-600 via-red-500 to-pink-600 text-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float animation-delay-300"></div>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <h1 className="text-5xl font-bold text-center mb-4 animate-fade-in-up">
+            Our <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Delicious</span> Products
+          </h1>
+          <p className="text-center text-xl opacity-90 mb-8 animate-fade-in-up animation-delay-300">
+            Discover our mouth-watering selection of cakes and fast food 🍰🍔
           </p>
 
           <SearchBar
             onSearch={setSearchQuery}
             placeholder="Search for cakes, burgers, combos..."
-            className="max-w-3xl"
+            className="max-w-3xl text-gray-600"
           />
         </div>
       </section>
@@ -237,10 +178,10 @@ const Products = () => {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {sortedProducts.map((product) => (
-                <Card key={product.id || product._id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              {sortedProducts.map((product, index) => (
+                <Card key={product.id || product._id} className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:rotate-1 animate-bounce-in hover-lift" style={{animationDelay: `${index * 100}ms`}}>
                   <CardContent className="p-0">
-                    <div className="relative overflow-hidden rounded-t-lg">
+                    <div className="relative overflow-hidden rounded-t-lg cursor-pointer" onClick={() => navigate(`/product/${product._id}`)}>
                       <img 
                         src={product.image || product.imageUrl} 
                         alt={product.name}
@@ -267,7 +208,7 @@ const Products = () => {
                         </div>
                       </div>
                       
-                      <h4 className="font-semibold text-gray-800 mb-2">{product.name}</h4>
+                      <h4 className="font-semibold text-gray-800 mb-2 cursor-pointer hover:text-orange-600" onClick={() => navigate(`/product/${product._id}`)}>{product.name}</h4>
                       <p className="text-sm text-gray-600 mb-3">{product.description}</p>
                       
                       <div className="flex items-center justify-between">

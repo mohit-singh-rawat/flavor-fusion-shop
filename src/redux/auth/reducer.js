@@ -1,10 +1,12 @@
 import { authActionTypes } from "./constant";
 
 
+import { isUserAuthenticated } from '../../utils/auth';
+
 const CREATE_LOGIN_DATA_INITIAL_STATE = {
     data: [],
     loading: false,
-    isAuthenticated: false,
+    isAuthenticated: isUserAuthenticated(),
 }
 
 const CREATE_REGISTER_DATA_INITIAL_STATE = {

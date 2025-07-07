@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart, User, Clock, Award, Users, MapPin } from 'lucide-react';
+import { Clock, Award, Users, MapPin } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import '../styles/animations.css';
 import { Card, CardContent } from '../components/ui/card';
-
+import AnkushImage from '../assets/images';
+import SanchitImage from '../assets/images';
+import AyushImage from '../assets/images'; 
 const About = () => {
   const stats = [
     { icon: Users, label: "Happy Customers", value: "10,000+" },
@@ -11,72 +14,42 @@ const About = () => {
     { icon: MapPin, label: "Locations Served", value: "50+" }
   ];
 
-  const team = [
-    {
-      name: "Chef Maria Rodriguez",
-      role: "Head Baker",
-      image: "https://images.unsplash.com/photo-1594824720293-31dd4f1cbdc3?w=300&h=300&fit=crop&crop=face",
-      description: "15+ years of experience in artisanal baking"
-    },
-    {
-      name: "John Smith",
-      role: "Kitchen Manager", 
-      image: "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=300&h=300&fit=crop&crop=face",
-      description: "Expert in fast food preparation and quality control"
-    },
-    {
-      name: "Sarah Johnson",
-      role: "Operations Director",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&h=300&fit=crop&crop=face",
-      description: "Ensuring smooth operations and customer satisfaction"
-    }
-  ];
+const team = [
+  {
+    name: "Chef Sanchit Negi",
+    role: "Head Baker & CEO Or Director",
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZMIBGLWDQMgb7ySRtkAyoXGw_GIaj9smqew&s',
+    description: "15+ years of experience in artisanal baking"
+  },
+  {
+    name: "Ayush Singh Bisht",
+    role: "Kitchen Manager", 
+    image: 'https://www.eatingwell.com/thmb/rMkPIu4kqvqLEvP50QPRmKJrsU0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/LegendPR_Kristen_Kish_2108-2000-59507b8a4d9d431dbd22880765db43fd.jpg',
+    description: "Expert in fast food preparation and quality control"
+  },
+  {
+    name: "Ankush Rawat",
+    role: "Kitchen Master",
+    image: 'https://www.shape.com/thmb/CZBa9yKcSqcKEUhoYyPrOJf975Q=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/kaysen-700_0-7531093e39fa40bead36d5651bc60383.jpg',
+    description: "Ensuring smooth operations and customer satisfaction"
+  }
+];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">🍰</span>
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                  Negi Cake House
-                </h1>
-              </Link>
-            </div>
-            
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Home</Link>
-              <Link to="/products" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Products</Link>
-              <Link to="/categories" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">Categories</Link>
-              <Link to="/about" className="text-orange-600 font-semibold">About</Link>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon">
-                <Heart className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <User className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Hero Section */}
-      <section className="py-12 bg-gradient-to-r from-orange-600 to-red-600 text-white">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-4">About Negi Cake House</h1>
-          <p className="text-center text-xl opacity-90 max-w-3xl mx-auto">
-            Bringing you the finest cakes and fast food with passion, quality, and love since 2009
+      <section className="py-16 bg-gradient-to-r from-orange-600 via-red-500 to-pink-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-40 h-40 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float"></div>
+          <div className="absolute bottom-10 right-10 w-32 h-32 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float animation-delay-300"></div>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <h1 className="text-5xl font-bold text-center mb-4 animate-fade-in-up">
+            About <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Negi Cake House</span> 🏠
+          </h1>
+          <p className="text-center text-xl opacity-90 max-w-3xl mx-auto animate-fade-in-up animation-delay-300">
+            Bringing you the finest cakes and fast food with passion, quality, and love since 2009 ❤️
           </p>
         </div>
       </section>
@@ -151,7 +124,7 @@ const About = () => {
               <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                 <CardContent className="p-6">
                   <img 
-                    src={member.image} 
+                    src={member?.image || 'C:\Users\Mohit\Downloads\SanchitCakeHouse\flavor-fusion-shop\src\assets\Ankush.jpg'} 
                     alt={member.name}
                     className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
                   />
@@ -209,12 +182,16 @@ const About = () => {
             Join thousands of satisfied customers who have made Negi Cake House their go-to choice for special occasions and everyday treats.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 font-semibold px-8 py-4">
-              Order Now
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 px-8 py-4">
-              Contact Us
-            </Button>
+            <Link to="/products">
+              <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 font-semibold px-8 py-4">
+                Order Now
+              </Button>
+            </Link>
+            <Link to="/contact">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 px-8 py-4">
+                Contact Us
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

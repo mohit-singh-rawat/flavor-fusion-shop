@@ -15,6 +15,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 import '../styles/animations.css';
 import { toast } from 'sonner';
 import { isUserAuthenticated, clearAuthData } from '../utils/auth';
+import { useSelector } from 'react-redux';
 
 const Navbar = () => {
   const { cartCount } = useCart();
@@ -22,6 +23,10 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const authState = useSelector((state) => state.auth);
+  
+  // Check authentication status
+  const isAuthenticated = authState?.isAuthenticated || isUserAuthenticated();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -37,19 +42,13 @@ const Navbar = () => {
     navigate('/');
   };
 
-  // Check token expiration periodically
+  // Check token expiration only on page load
   useEffect(() => {
-    const checkAuth = () => {
-      if (!isUserAuthenticated() && localStorage.getItem('token')) {
-        clearAuthData();
-        toast.error('Session expired. Please login again.', { duration: 2000 });
-        navigate('/login');
-      }
-    };
-    
-    const interval = setInterval(checkAuth, 60000); // Check every minute
-    return () => clearInterval(interval);
-  }, [navigate]);
+    if (!isUserAuthenticated() && localStorage.getItem('token')) {
+      clearAuthData();
+      toast.error('Session expired. Please login again.', { duration: 2000 });
+    }
+  }, []);
 
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode;
@@ -119,9 +118,9 @@ const Navbar = () => {
                 isDarkMode ? 'text-white hover:bg-amber-800' : 'hover:bg-gray-100'
               }`}
               onClick={() => {
-                if (!isUserAuthenticated()) {
+                if (!isAuthenticated) {
                   toast.error('Please login to view your wishlist!', { duration: 1000 });
-                  setTimeout(() => navigate('/login'), 1000);
+                  navigate('/login');
                 } else if (wishlistCount === 0) {
                   toast.error('Your wishlist is empty!', { duration: 1000 });
                   setTimeout(() => navigate('/products'), 1000);
@@ -144,9 +143,9 @@ const Navbar = () => {
                 isDarkMode ? 'text-white hover:bg-amber-800' : 'hover:bg-gray-100'
               }`}
               onClick={() => {
-                if (!isUserAuthenticated()) {
+                if (!isAuthenticated) {
                   toast.error('Please login to view your cart!', { duration: 1000 });
-                  setTimeout(() => navigate('/login'), 1000);
+                  navigate('/login');
                 } else if (cartCount === 0) {
                   toast.error('Your cart is empty!', { duration: 1000 });
                   setTimeout(() => navigate('/products'), 1000);
@@ -163,41 +162,66 @@ const Navbar = () => {
               )}
             </Button>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className={`${
-                  isDarkMode ? 'text-white hover:bg-amber-800' : 'hover:bg-gray-100'
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className={`${
+                    isDarkMode ? 'text-white hover:bg-amber-800' : 'hover:bg-gray-100'
+                  }`}>
+                    <User className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className={`w-48 ${
+                  isDarkMode ? 'bg-amber-800 text-white border-amber-700' : 'bg-white'
                 }`}>
-                  <User className="w-5 h-5" />
+                  <DropdownMenuItem onClick={toggleDarkMode} className={`cursor-pointer ${
+                    isDarkMode ? 'hover:bg-amber-700' : 'hover:bg-gray-100'
+                  }`}>
+                    {isDarkMode ? (
+                      <>
+                        <Sun className="w-4 h-4 mr-2" />
+                        Light Mode
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="w-4 h-4 mr-2" />
+                        Dark Mode
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className={isDarkMode ? 'bg-amber-700' : ''} />
+                  <DropdownMenuItem onClick={handleLogout} className={`cursor-pointer text-red-500 ${
+                    isDarkMode ? 'hover:bg-amber-700' : 'hover:bg-gray-100'
+                  }`}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={toggleDarkMode}
+                  className={`${
+                    isDarkMode ? 'text-white hover:bg-amber-800' : 'hover:bg-gray-100'
+                  }`}
+                >
+                  {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className={`w-48 ${
-                isDarkMode ? 'bg-amber-800 text-white border-amber-700' : 'bg-white'
-              }`}>
-                <DropdownMenuItem onClick={toggleDarkMode} className={`cursor-pointer ${
-                  isDarkMode ? 'hover:bg-amber-700' : 'hover:bg-gray-100'
-                }`}>
-                  {isDarkMode ? (
-                    <>
-                      <Sun className="w-4 h-4 mr-2" />
-                      Light Mode
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-4 h-4 mr-2" />
-                      Dark Mode
-                    </>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className={isDarkMode ? 'bg-amber-700' : ''} />
-                <DropdownMenuItem onClick={handleLogout} className={`cursor-pointer text-red-500 ${
-                  isDarkMode ? 'hover:bg-amber-700' : 'hover:bg-gray-100'
-                }`}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <Button 
+                  variant="outline" 
+                  className={`${
+                    isDarkMode ? 'border-amber-600 text-white hover:bg-amber-800' : 'border-orange-300 text-orange-600 hover:bg-orange-50'
+                  }`}
+                  onClick={() => navigate('/login')}
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Login
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

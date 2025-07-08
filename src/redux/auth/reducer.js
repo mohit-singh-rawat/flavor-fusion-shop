@@ -24,6 +24,9 @@ export const createLoginReducer = (state = CREATE_LOGIN_DATA_INITIAL_STATE, acti
                 loading: true,
             }
         case authActionTypes.AUTH_LOGIN_SUCCESS:
+            // Store token and user data
+            localStorage.setItem('token', action.payload.token);
+            localStorage.setItem('user', JSON.stringify(action.payload));
             return {
                 ...state,
                 data: action.payload,
@@ -31,6 +34,9 @@ export const createLoginReducer = (state = CREATE_LOGIN_DATA_INITIAL_STATE, acti
                 isAuthenticated: true,
             }
         case authActionTypes.AUTH_LOGIN_RESET:
+            // Clear stored data
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
             return {
                 ...state,
                 data: [],

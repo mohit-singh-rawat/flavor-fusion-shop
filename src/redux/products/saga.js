@@ -42,7 +42,7 @@ function* getProductFunction(action){
             type: ProductActiontypes.GET_PRODUCT_LOADING,
             payload: {},
         });
-        const response = yield call(getProducts);
+        const response = yield call(getProducts, { limit: 50 }); // Get more products
         const responseData = response.data;
         if (response.status === 200) {
             // Handle both direct array response and nested data response

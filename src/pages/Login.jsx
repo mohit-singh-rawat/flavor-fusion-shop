@@ -39,7 +39,7 @@ const Login = () => {
     if (authState.error) {
       toast({
         title: 'Login Failed',
-        description: authState.error.message || 'Invalid credentials',
+        description: authState.error.response?.data?.message || authState.error.message || 'Invalid credentials',
         variant: 'destructive',
       });
     }
@@ -95,8 +95,12 @@ const Login = () => {
             {errors.password && <p className="text-sm text-red-500 mt-1">Password is required</p>}
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
-            🚀 Login
+          <Button 
+            type="submit" 
+            disabled={authState.loading}
+            className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50"
+          >
+            {authState.loading ? 'Logging in...' : '🚀 Login'}
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">

@@ -23,12 +23,8 @@ const queryClient = new QueryClient();
 
 const ConditionalNavbar = () => {
   const location = useLocation();
-  const hideNavbarPaths = ['/login', '/register'];
   
-  if (hideNavbarPaths.includes(location.pathname)) {
-    return null;
-  }
-  
+  // Always show navbar - users need navigation
   return <Navbar />;
 };
 
@@ -36,10 +32,10 @@ const PrivateRoute = ({ children }) => {
   const authState = useSelector((state) => state.auth);
   const location = useLocation();
 
-  if (authState.isAuthenticated || isUserAuthenticated()) {
+  if (authState?.isAuthenticated || isUserAuthenticated()) {
     return children;
   } else {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" replace />;
   }
 };
 

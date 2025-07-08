@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { createLoginAction } from '../redux/auth/action';
@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { useToast } from '../components/ui/use-toast';
 import '../styles/animations.css';
 import { isUserAuthenticated } from '../utils/auth';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -16,6 +17,7 @@ const Login = () => {
   const location = useLocation();
   const { toast } = useToast();
   const authState = useSelector((state) => state.auth);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -70,7 +72,26 @@ const Login = () => {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <Input id="password" type="password" {...register('password', { required: true })} placeholder="Enter your password" />
+            <div className="relative">
+              <Input 
+                id="password" 
+                type={showPassword ? "text" : "password"} 
+                {...register('password', { required: true })} 
+                placeholder="Enter your password"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                ) : (
+                  <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                )}
+              </button>
+            </div>
             {errors.password && <p className="text-sm text-red-500 mt-1">Password is required</p>}
           </div>
 

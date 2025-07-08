@@ -1,22 +1,55 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { isUserAuthenticated } from '../utils/auth';
+import { useSelector } from 'react-redux';
 
 const WishlistContext = createContext(undefined);
 
 export const WishlistProvider = ({ children }) => {
   const [wishlistItems, setWishlistItems] = useState([]);
+  const authState = useSelector((state) => state.auth);
+  
+  // Get user-specific wishlist key
+  const getWishlistKey = () => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return user._id ? `wishlistItems_${user._id}` : 'wishlistItems_guest';
+  };
 
   // Load wishlist from localStorage on mount
   useEffect(() => {
-    const savedWishlist = localStorage.getItem('wishlistItems');
+    const wishlistKey = getWishlistKey();
+    const savedWishlist = localStorage.getItem(wishlistKey);
     if (savedWishlist) {
       setWishlistItems(JSON.parse(savedWishlist));
     }
-  }, []);
+  }, [authState.isAuthenticated]);
 
   // Save wishlist to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('wishlistItems', JSON.stringify(wishlistItems));
+    const wishlistKey = getWishlistKey();
+    localStorage.setItem(wishlistKey, JSON.stringify(wishlistItems));
   }, [wishlistItems]);
+  
+  // Handle login - merge guest wishlist with user wishlist
+  useEffect(() => {
+    if (authState.isAuthenticated) {
+      const guestWishlist = JSON.parse(localStorage.getItem('wishlistItems_guest') || '[]');
+      const userWishlistKey = getWishlistKey();
+      const userWishlist = JSON.parse(localStorage.getItem(userWishlistKey) || '[]');
+      
+      // Merge guest wishlist with user wishlist
+      if (guestWishlist.length > 0) {
+        const mergedWishlist = [...userWishlist];
+        guestWishlist.forEach(guestItem => {
+          const exists = mergedWishlist.find(item => item.id === guestItem.id);
+          if (!exists) {
+            mergedWishlist.push(guestItem);
+          }
+        });
+        setWishlistItems(mergedWishlist);
+        localStorage.removeItem('wishlistItems_guest'); // Clear guest wishlist
+      }
+    }
+  }, [authState.isAuthenticated]);
 
   const addToWishlist = (product) => {
     setWishlistItems(prevItems => {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { createRegisterAction } from '../redux/auth/action';
@@ -26,8 +26,8 @@ const Register = () => {
 
   const password = watch('password');
 
-  const authState = useSelector((state) => state.auth);
-  console.log(authState,'authsate')
+  const authState = useSelector((state) => state.register);
+  console.log(authState,'register state')
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -47,13 +47,14 @@ const Register = () => {
     if (authState.error) {
       toast({
         title: 'Registration Failed',
-        description: authState.error.message || 'Please try again',
+        description: authState.error.response?.data?.message || authState.error.message || 'Please try again',
         variant: 'destructive',
       });
     }
   }, [authState, navigate, toast]);
 
   const onSubmit = (data) => {
+    console.log(data,'data')
     if (data.password !== data.confirmPassword) {
       toast({
         title: 'Validation Error',
@@ -166,9 +167,10 @@ const Register = () => {
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+            disabled={authState.loading}
+            className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50"
           >
-            🎆 Create Account
+            {authState.loading ? 'Creating Account...' : '🎆 Create Account'}
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">

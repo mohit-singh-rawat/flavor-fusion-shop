@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Star, Trash2 } from 'lucide-react';
+import { Star, Trash2, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';

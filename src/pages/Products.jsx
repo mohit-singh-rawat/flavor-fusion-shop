@@ -9,23 +9,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import { useWishlist } from "../contexts/WishlistContext";
 import { toast } from "sonner";
 import SearchBar from "../components/SearchBar";
+import Pagination from "../components/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductAction } from "../redux/products/action";
 import '../styles/animations.css';
 
 const Products = () => {
   const navigate = useNavigate();
+  const { category: urlCategory } = useParams();
   const { addToCart, cartCount } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist, wishlistCount } =
     useWishlist();
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory || "all");
   const [sortBy, setSortBy] = useState("name");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const dispatch = useDispatch();
   const productState = useSelector((state) => state.getProducts || {});
   const { data: products = [], loading = false } = productState;
@@ -34,6 +38,13 @@ const Products = () => {
   useEffect(() => {
     dispatch(getProductAction());
   }, [dispatch]);
+
+  // Update selected category when URL changes
+  useEffect(() => {
+    if (urlCategory) {
+      setSelectedCategory(urlCategory);
+    }
+  }, [urlCategory]);
 
   const productsToUse = Array.isArray(products) ? products : [];
 
@@ -58,6 +69,23 @@ const Products = () => {
         return a.name.localeCompare(b.name);
     }
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProducts = sortedProducts.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    console.log(page,"pages")
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, sortBy, searchQuery]);
 
 
   const toggleWishlist = (product) => {
@@ -98,10 +126,18 @@ const Products = () => {
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <h1 className="text-5xl font-bold text-center mb-4 animate-fade-in-up">
-            Our <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Delicious</span> Products
+            {urlCategory ? (
+              <>
+                <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent capitalize">
+                  {urlCategory === 'party-supplies' ? 'Party Supplies' : urlCategory}
+                </span> Collection
+              </>
+            ) : (
+              <>Our <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Delicious</span> Products</>
+            )}
           </h1>
           <p className="text-center text-xl opacity-90 mb-8 animate-fade-in-up animation-delay-300">
-            Discover our mouth-watering selection of cakes and fast food 🍰🍔
+            {urlCategory ? `Explore our amazing ${urlCategory === 'party-supplies' ? 'party supplies' : urlCategory} collection` : 'Discover our mouth-watering selection of cakes and fast food 🍰🍔'}
           </p>
 
           <SearchBar
@@ -117,9 +153,14 @@ const Products = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="text-lg font-semibold text-gray-700">
-              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+              {sortedProducts.length} product{sortedProducts.length !== 1 ? 's' : ''} found
               {searchQuery && (
                 <span className="text-orange-600 ml-2">for "{searchQuery}"</span>
+              )}
+              {totalPages > 1 && (
+                <span className="text-sm text-gray-500 ml-2">
+                  (Page {currentPage} of {totalPages})
+                </span>
               )}
             </div>
             
@@ -134,6 +175,9 @@ const Products = () => {
                   <SelectItem value="cakes">Cakes</SelectItem>
                   <SelectItem value="fastfood">Fast Food</SelectItem>
                   <SelectItem value="combos">Combos</SelectItem>
+                  <SelectItem value="toys">Toys</SelectItem>
+                  <SelectItem value="drinks">Drinks</SelectItem>
+                  <SelectItem value="party-supplies">Party Supplies</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -161,7 +205,7 @@ const Products = () => {
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500 mx-auto mb-4"></div>
               <p className="text-gray-600">Loading products...</p>
             </div>
-          ) : filteredProducts.length === 0 ? (
+          ) : sortedProducts.length === 0 ? (
             <div className="text-center py-16">
               <Search className="w-24 h-24 mx-auto text-gray-300 mb-4" />
               <h3 className="text-2xl font-bold text-gray-600 mb-2">No products found</h3>
@@ -178,7 +222,7 @@ const Products = () => {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {sortedProducts.map((product, index) => (
+              {paginatedProducts.map((product, index) => (
                 <Card key={product.id || product._id} className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:rotate-1 animate-bounce-in hover-lift" style={{animationDelay: `${index * 100}ms`}}>
                   <CardContent className="p-0">
                     <div className="relative overflow-hidden rounded-t-lg cursor-pointer" onClick={() => navigate(`/product/${product._id}`)}>
@@ -226,6 +270,17 @@ const Products = () => {
                 </Card>
               ))}
             </div>
+          )}
+     
+          {/* Pagination */}
+          {!loading && sortedProducts.length > itemsPerPage && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={sortedProducts.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+            />
           )}
         </div>
       </section>

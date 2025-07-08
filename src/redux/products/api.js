@@ -10,7 +10,8 @@ export function updateProduct(params){
     return putRequest(`${URL.getProductById}/${id}`, data);
 }
 export function getProducts(params = {}){
-    return getRequest(URL.getProducts);
+    const { page = 1, limit = 50 } = params; // Get more products by default
+    return getRequest(`${URL.getProducts}?page=${page}&limit=${limit}`);
 }
 
 export function getProductById(params){

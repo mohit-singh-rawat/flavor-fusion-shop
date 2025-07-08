@@ -24,6 +24,7 @@ const Categories = () => {
   const categories = [
     {
       name: "Cakes",
+      slug: "cakes",
       description: "Handcrafted cakes for special occasions",
       image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&h=400&fit=crop",
       count: getProductsByCategory('cakes').length,
@@ -31,6 +32,7 @@ const Categories = () => {
     },
     {
       name: "Fast Food",
+      slug: "fastfood",
       description: "Quick, delicious meals for any time",
       image: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=600&h=400&fit=crop",
       count: getProductsByCategory('fastfood').length,
@@ -38,10 +40,35 @@ const Categories = () => {
     },
     {
       name: "Combos",
+      slug: "combos",
       description: "Perfect combinations for great value",
       image: "https://tb-static.uber.com/prod/image-proc/processed_images/be11e1fa0362b57e465f4311fa0b50ac/8a42ee7a692dfa4155879820804a277f.jpeg",
       count: getProductsByCategory('combos').length,
       products: getProductsByCategory('combos').slice(0, 4).map(p => p.name)
+    },
+    {
+      name: "Toys",
+      slug: "toys",
+      description: "Fun toys and gifts for kids",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop",
+      count: getProductsByCategory('toys').length,
+      products: getProductsByCategory('toys').slice(0, 4).map(p => p.name)
+    },
+    {
+      name: "Drinks",
+      slug: "drinks",
+      description: "Refreshing beverages and smoothies",
+      image: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=600&h=400&fit=crop",
+      count: getProductsByCategory('drinks').length,
+      products: getProductsByCategory('drinks').slice(0, 4).map(p => p.name)
+    },
+    {
+      name: "Party Supplies",
+      slug: "party-supplies",
+      description: "Everything you need for celebrations",
+      image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&h=400&fit=crop",
+      count: getProductsByCategory('party-supplies').length,
+      products: getProductsByCategory('party-supplies').slice(0, 4).map(p => p.name)
     }
   ];
 
@@ -96,10 +123,12 @@ const Categories = () => {
                       </div>
                     </div>
                     
-                    <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 group">
-                      Explore Category
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+                    <Link to={`/products/category/${category.slug}`}>
+                      <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 group">
+                        Explore Category
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>

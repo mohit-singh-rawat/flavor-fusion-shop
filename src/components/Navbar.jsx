@@ -15,18 +15,25 @@ import { useWishlist } from '../contexts/WishlistContext';
 import '../styles/animations.css';
 import { toast } from 'sonner';
 import { isUserAuthenticated, clearAuthData } from '../utils/auth';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { authActionTypes } from '../redux/auth/constant';
 
 const Navbar = () => {
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const authState = useSelector((state) => state.auth);
   
-  // Check authentication status
-  const isAuthenticated = authState?.isAuthenticated || isUserAuthenticated();
+  // Check authentication status - force re-render when auth state changes
+  const [isAuthenticated, setIsAuthenticated] = useState(authState?.isAuthenticated || isUserAuthenticated());
+  
+  // Update authentication status when Redux state changes
+  useEffect(() => {
+    setIsAuthenticated(authState?.isAuthenticated || isUserAuthenticated());
+  }, [authState?.isAuthenticated]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -38,6 +45,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     clearAuthData();
+    // Dispatch logout action to update Redux state
+    dispatch({ type: authActionTypes.AUTH_LOGIN_RESET });
     toast.success('Logged out successfully!', { duration: 1000 });
     navigate('/');
   };

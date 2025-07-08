@@ -83,9 +83,9 @@ const Contact = () => {
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Address</h3>
                       <p className="text-gray-600">
-                        123 Food Street, Tasty City<br />
-                        Near Central Mall, Pin: 123456<br />
-                        State, Country
+                        Parsundakhal, Pauri Garhwal<br />
+                        Near SBI Bank, Pin: 246164<br />
+                        Uttarakhand, India
                       </p>
                     </div>
                   </div>
@@ -101,9 +101,9 @@ const Contact = () => {
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Phone Numbers</h3>
                       <p className="text-gray-600">
-                        Main: +91 98765 43210<br />
-                        Orders: +91 98765 43211<br />
-                        Support: +91 98765 43212
+                        Main No.: +91 976-075-3245<br />
+                        Orders: +91 897-949-7204<br />
+                        Support: +91 879-149-5723
                       </p>
                     </div>
                   </div>
@@ -119,9 +119,9 @@ const Contact = () => {
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Email</h3>
                       <p className="text-gray-600">
-                        General: info@negicakehouse.com<br />
-                        Orders: orders@negicakehouse.com<br />
-                        Support: support@negicakehouse.com
+                        General: negicakehouse@gmail.com<br />
+                        Orders: kinshiuk12@gmail.com<br />
+                        Support: sanchitnegi@gmail.com
                       </p>
                     </div>
                   </div>
@@ -139,7 +139,7 @@ const Contact = () => {
                       <p className="text-gray-600">
                         Monday - Friday: 9:00 AM - 10:00 PM<br />
                         Saturday - Sunday: 8:00 AM - 11:00 PM<br />
-                        Holidays: 10:00 AM - 9:00 PM
+                        Holidays: Month last Date 30/--/yyyy
                       </p>
                     </div>
                   </div>

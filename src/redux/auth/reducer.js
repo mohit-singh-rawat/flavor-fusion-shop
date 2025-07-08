@@ -4,7 +4,7 @@ import { authActionTypes } from "./constant";
 import { isUserAuthenticated } from '../../utils/auth';
 
 const CREATE_LOGIN_DATA_INITIAL_STATE = {
-    data: [],
+    data: JSON.parse(localStorage.getItem('user')) || [],
     loading: false,
     isAuthenticated: isUserAuthenticated(),
 }

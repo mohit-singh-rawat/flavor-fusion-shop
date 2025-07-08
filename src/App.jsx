@@ -23,8 +23,12 @@ const queryClient = new QueryClient();
 
 const ConditionalNavbar = () => {
   const location = useLocation();
+  const hideNavbarPaths = ['/login', '/register'];
   
-  // Always show navbar - users need navigation
+  if (hideNavbarPaths.includes(location.pathname)) {
+    return null;
+  }
+  
   return <Navbar />;
 };
 
@@ -51,6 +55,7 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/index" element={<Index />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/products/category/:category" element={<Products />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/about" element={<About />} />

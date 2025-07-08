@@ -14,20 +14,22 @@ function* createLoginFunction(data) {
             payload: {},
         });
         const response = yield call(createApiLogin, data);
-        const decryptedData = response.data.data;
+        console.log('Login response:', response);
+        
         if (response.status === 200) {
+            const userData = response.data;
             yield put({
                 type: authActionTypes.AUTH_LOGIN_SUCCESS,
-                payload: { ...decryptedData },
+                payload: userData,
             });
         } else {
             yield put({
                 type: authActionTypes.AUTH_LOGIN_ERROR,
-                payload: { ...decryptedData },
+                payload: response.data,
             });
         }
     } catch (error) {
-        // ToastHandle(error, 'danger')
+        console.error('Login error:', error);
         yield put({
             type: authActionTypes.AUTH_LOGIN_ERROR,
             payload: error,
@@ -42,19 +44,22 @@ function* createRegisterFunction(data) {
             payload: {},
         });
         const response = yield call(createApiRegister, data);
-        const decryptedData = response.data.data;
+        console.log('Register response:', response);
+        
         if (response.status === 201) {
+            const userData = response.data;
             yield put({
                 type: authActionTypes.AUTH_REGISTER_SUCCESS,
-                payload: { ...decryptedData },
+                payload: userData,
             });
         } else {
             yield put({
                 type: authActionTypes.AUTH_REGISTER_ERROR,
-                payload: { ...decryptedData },
+                payload: response.data,
             });
         }
     } catch (error) {
+        console.error('Register error:', error);
         yield put({
             type: authActionTypes.AUTH_REGISTER_ERROR,
             payload: error,

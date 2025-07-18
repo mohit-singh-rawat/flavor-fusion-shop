@@ -1,23 +1,14 @@
-// Token utility functions
-export const isTokenExpired = (token) => {
-  if (!token) return true;
+export const isUserAuthenticated = () => {
+  const token = localStorage.getItem('token');
+  if (!token) return false;
   
   try {
+    // Basic token validation - in production, you'd verify JWT expiration
     const payload = JSON.parse(atob(token.split('.')[1]));
-    const currentTime = Date.now() / 1000;
-    return payload.exp < currentTime;
-  } catch (error) {
-    return true;
+    return payload.exp > Date.now() / 1000;
+  } catch {
+    return false;
   }
-};
-
-export const getTokenFromStorage = () => {
-  return localStorage.getItem('token');
-};
-
-export const isUserAuthenticated = () => {
-  const token = getTokenFromStorage();
-  return token && !isTokenExpired(token);
 };
 
 export const clearAuthData = () => {

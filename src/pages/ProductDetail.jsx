@@ -7,6 +7,12 @@ import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProductAction } from '../redux/products/action';
+import { getReviewsAction, addReviewAction } from '../redux/reviews/action';
+import ReviewForm from '../components/ReviewForm';
+import ReviewList from '../components/ReviewList';
+import RelatedProducts from '../components/RelatedProducts';
+import { isUserAuthenticated } from '../utils/auth';
+import { toast } from 'sonner';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -15,6 +21,8 @@ const ProductDetail = () => {
   
   const dispatch = useDispatch();
   const { data: products = [] } = useSelector((state) => state.getProducts || {});
+  const reviewsState = useSelector((state) => state.reviews);
+  const addReviewState = useSelector((state) => state.addReview);
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
@@ -26,8 +34,25 @@ const ProductDetail = () => {
     if (products.length > 0) {
       const product = products.find(p => p._id === id);
       setSelectedProduct(product);
+      if (product) {
+        dispatch(getReviewsAction({ productId: id }));
+        // Add to recently viewed
+        if (window.addToRecentlyViewed) {
+          window.addToRecentlyViewed(product);
+        }
+      }
     }
-  }, [products, id]);
+  }, [products, id, dispatch]);
+
+  useEffect(() => {
+    if (addReviewState.success) {
+      toast.success('Review added successfully!');
+      dispatch(getReviewsAction({ productId: id }));
+    }
+    if (addReviewState.error) {
+      toast.error('Failed to add review');
+    }
+  }, [addReviewState.success, addReviewState.error, dispatch, id]);
 
   if (!selectedProduct) {
     return (
@@ -56,7 +81,7 @@ const ProductDetail = () => {
       quantity: quantity
     };
     addToCart(cartItem);
-    alert(`${selectedProduct.name} added to cart!`);
+    toast.success(`${selectedProduct.name} added to cart!`, { duration: 2000 });
   };
 
   const handleWishlistToggle = () => {
@@ -74,6 +99,19 @@ const ProductDetail = () => {
     } else {
       addToWishlist(wishlistItem);
     }
+  };
+
+  const handleReviewSubmit = (reviewData) => {
+    if (!isUserAuthenticated()) {
+      toast.error('Please login to add a review');
+      return;
+    }
+    dispatch(addReviewAction({
+      data: {
+        productId: selectedProduct._id,
+        ...reviewData
+      }
+    }));
   };
 
   return (
@@ -212,6 +250,27 @@ const ProductDetail = () => {
             </Card>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <div className="mt-12">
+          <ReviewList 
+            reviews={reviewsState.data} 
+            loading={reviewsState.loading} 
+          />
+          
+          {isUserAuthenticated() && (
+            <ReviewForm 
+              onSubmit={handleReviewSubmit}
+              loading={addReviewState.loading}
+            />
+          )}
+        </div>
+
+        {/* Related Products */}
+        <RelatedProducts 
+          productId={selectedProduct._id}
+          category={selectedProduct.category}
+        />
       </div>
     </div>
   );

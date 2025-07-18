@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from './ui/button';
+import { toast } from 'sonner';
 
 const RazorpayButton = ({ amount, onSuccess, onError }) => {
   const loadRazorpayScript = () => {
@@ -16,7 +17,7 @@ const RazorpayButton = ({ amount, onSuccess, onError }) => {
     const scriptLoaded = await loadRazorpayScript();
     
     if (!scriptLoaded) {
-      alert('Razorpay SDK failed to load');
+      toast.error('Razorpay SDK failed to load', { duration: 3000 });
       return;
     }
 
@@ -57,14 +58,14 @@ const RazorpayButton = ({ amount, onSuccess, onError }) => {
             const verifyResult = await verifyResponse.json();
             
             if (verifyResult.success) {
-              alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+              toast.success(`Payment successful! Payment ID: ${response.razorpay_payment_id}`, { duration: 3000 });
               onSuccess?.(response);
             } else {
-              alert('Payment verification failed');
+              toast.error('Payment verification failed', { duration: 3000 });
               onError?.('Verification failed');
             }
           } catch (error) {
-            alert('Payment verification error');
+            toast.error('Payment verification error', { duration: 3000 });
             onError?.(error);
           }
         },
@@ -81,7 +82,7 @@ const RazorpayButton = ({ amount, onSuccess, onError }) => {
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
-      alert('Payment failed');
+      toast.error('Payment failed', { duration: 3000 });
       onError?.(error);
     }
   };

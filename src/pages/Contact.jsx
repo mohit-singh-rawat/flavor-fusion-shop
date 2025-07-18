@@ -4,6 +4,7 @@ import { Phone, Mail, MapPin, Clock, Send, MessageSquare } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent } from '../components/ui/card';
+import { toast } from 'sonner';
 import '../styles/animations.css';
 
 const Contact = () => {
@@ -37,13 +38,13 @@ const Contact = () => {
       });
 
       if (response.ok) {
-        alert('Complaint submitted successfully! We will get back to you soon.');
+        toast.success('Complaint submitted successfully! We will get back to you soon.', { duration: 3000 });
         setComplaint({ name: '', email: '', phone: '', subject: '', message: '' });
       } else {
-        alert('Failed to submit complaint. Please try again.');
+        toast.error('Failed to submit complaint. Please try again.', { duration: 3000 });
       }
     } catch (error) {
-      alert('Error submitting complaint. Please try again.');
+      toast.error('Error submitting complaint. Please try again.', { duration: 3000 });
     } finally {
       setIsSubmitting(false);
     }

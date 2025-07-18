@@ -9,6 +9,8 @@ export const getProductById ='/api/products/';
 export const updateProduct = '/api/products/';
 export const createProduct = '/api/products/create';
 export const addToCart = 'api/cart/';
+// profile
+export const profile = '/api/profile';
 
 export const placeOrder = '/orders/place';
 export const getOrderHistory = '/orders/history';

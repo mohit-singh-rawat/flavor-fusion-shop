@@ -10,8 +10,18 @@ export function updateProduct(params){
     return putRequest(`${URL.getProductById}/${id}`, data);
 }
 export function getProducts(params = {}){
-    const { page = 1, limit = 50 } = params; // Get more products by default
-    return getRequest(`${URL.getProducts}?page=${page}&limit=${limit}`);
+    const { page = 1, limit = 50, search = '', category = '', minPrice = '', maxPrice = '', sortBy = '', sortOrder = 'asc' } = params;
+    const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(search && { search }),
+        ...(category && { category }),
+        ...(minPrice && { minPrice: minPrice.toString() }),
+        ...(maxPrice && { maxPrice: maxPrice.toString() }),
+        ...(sortBy && { sortBy }),
+        ...(sortOrder && { sortOrder })
+    });
+    return getRequest(`${URL.getProducts}?${queryParams.toString()}`);
 }
 
 export function getProductById(params){

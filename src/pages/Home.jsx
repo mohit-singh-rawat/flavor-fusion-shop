@@ -8,6 +8,8 @@ import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import TrendingProducts from '../components/TrendingProducts';
+import PersonalizedRecommendations from '../components/PersonalizedRecommendations';
 import '../styles/animations.css';
 
 const Home = () => {
@@ -207,6 +209,20 @@ const Home = () => {
               </Card>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Trending Products */}
+      <section className={`py-16 ${isDarkMode ? 'bg-amber-800' : 'bg-gray-50'}`}>
+        <div className="container mx-auto px-4">
+          <TrendingProducts />
+        </div>
+      </section>
+
+      {/* Personalized Recommendations */}
+      <section className={`py-16 ${isDarkMode ? 'bg-amber-900' : 'bg-white'}`}>
+        <div className="container mx-auto px-4">
+          <PersonalizedRecommendations />
         </div>
       </section>
 

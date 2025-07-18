@@ -15,9 +15,15 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Contact from "./pages/Contact";
 import ProductDetail from "./pages/ProductDetail";
+import Dashboard from "./pages/Dashboard";
+import OrderHistory from "./pages/OrderHistory";
+import OrderDetails from "./pages/OrderDetails";
+import Compare from "./pages/Compare";
 import Navbar from "./components/Navbar";
-import { useSelector } from "react-redux";
+import LiveChat from "./components/LiveChat";
+import { useSelector, useDispatch } from "react-redux";
 import { isUserAuthenticated } from "./utils/auth";
+import { connectChat } from "./redux/chat/actions";
 
 const queryClient = new QueryClient();
 
@@ -43,11 +49,23 @@ const PrivateRoute = ({ children }) => {
   }
 };
 
+// Component to initialize chat connection
+const ChatInitializer = () => {
+  const dispatch = useDispatch();
+  
+  React.useEffect(() => {
+    dispatch(connectChat());
+  }, [dispatch]);
+  
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <CartProvider>
       <WishlistProvider>
         <BrowserRouter>
+          <ChatInitializer />
           <ConditionalNavbar />
           <Routes>
             <Route path="/" element={<Index />} />
@@ -57,6 +75,30 @@ const App = () => (
             <Route path="/products" element={<Products />} />
             <Route path="/products/category/:category" element={<Products />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <PrivateRoute>
+                  <OrderHistory />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/order/:orderId"
+              element={
+                <PrivateRoute>
+                  <OrderDetails />
+                </PrivateRoute>
+              }
+            />
             <Route path="/categories" element={<Categories />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
@@ -76,8 +118,10 @@ const App = () => (
                 </PrivateRoute>
               }
             />
+            <Route path="/compare" element={<Compare />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <LiveChat />
           <Toaster position="top-right" richColors />
         </BrowserRouter>
       </WishlistProvider>

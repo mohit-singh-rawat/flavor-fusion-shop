@@ -188,7 +188,7 @@ const team = [
               </Button>
             </Link>
             <Link to="/contact">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 px-8 py-4">
+              <Button size="lg" variant="outline" className="border-white text-orange-600 hover:bg-white hover:text-orange-600 px-8 py-4">
                 Contact Us
               </Button>
             </Link>

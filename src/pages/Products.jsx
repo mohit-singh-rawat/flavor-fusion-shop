@@ -17,6 +17,9 @@ import SearchBar from "../components/SearchBar";
 import Pagination from "../components/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductAction } from "../redux/products/action";
+import SearchFilters from "../components/SearchFilters";
+import RecentlyViewed from "../components/RecentlyViewed";
+import QuickView from "../components/QuickView";
 import '../styles/animations.css';
 
 const Products = () => {
@@ -29,6 +32,15 @@ const Products = () => {
   const [sortBy, setSortBy] = useState("name");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState({
+    search: '',
+    category: urlCategory || '',
+    minPrice: '',
+    maxPrice: '',
+    sortBy: ''
+  });
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const [showQuickView, setShowQuickView] = useState(false);
   const itemsPerPage = 10;
   const dispatch = useDispatch();
   const productState = useSelector((state) => state.getProducts || {});
@@ -36,8 +48,16 @@ const Products = () => {
   console.log(productState,'product')
 
   useEffect(() => {
-    dispatch(getProductAction());
-  }, [dispatch]);
+    dispatch(getProductAction(filters));
+  }, [dispatch, filters]);
+
+  const handleFiltersChange = (newFilters) => {
+    setFilters(newFilters);
+    setSearchQuery(newFilters.search);
+    setSelectedCategory(newFilters.category || 'all');
+    setSortBy(newFilters.sortBy || 'name');
+    setCurrentPage(1);
+  };
 
   // Update selected category when URL changes
   useEffect(() => {
@@ -115,6 +135,11 @@ const Products = () => {
     toast.success(`${product.name} added to cart!`, { duration: 3000 });
   };
 
+  const handleQuickView = (product) => {
+    setQuickViewProduct(product);
+    setShowQuickView(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
 
@@ -140,11 +165,13 @@ const Products = () => {
             {urlCategory ? `Explore our amazing ${urlCategory === 'party-supplies' ? 'party supplies' : urlCategory} collection` : 'Discover our mouth-watering selection of cakes and fast food 🍰🍔'}
           </p>
 
-          <SearchBar
-            onSearch={setSearchQuery}
-            placeholder="Search for cakes, burgers, combos..."
-            className="max-w-3xl text-gray-600"
-          />
+          <div className="max-w-4xl mx-auto">
+            <SearchFilters 
+            className = "text-black-600"
+              onFiltersChange={handleFiltersChange}
+              filters={filters}
+            />
+          </div>
         </div>
       </section>
 
@@ -257,13 +284,22 @@ const Products = () => {
                       
                       <div className="flex items-center justify-between">
                         <span className="text-xl font-bold text-orange-600">${product.price}</span>
-                        <Button 
-                          size="sm" 
-                          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-                          onClick={() => handleAddToCart(product)}
-                        >
-                          Add to Cart
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleQuickView(product)}
+                          >
+                            Quick View
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                            onClick={() => handleAddToCart(product)}
+                          >
+                            Add to Cart
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -282,8 +318,21 @@ const Products = () => {
               onPageChange={handlePageChange}
             />
           )}
+
+          {/* Recently Viewed */}
+          <RecentlyViewed />
         </div>
       </section>
+
+      {/* Quick View Modal */}
+      <QuickView
+        product={quickViewProduct}
+        isOpen={showQuickView}
+        onClose={() => setShowQuickView(false)}
+        onAddToCart={handleAddToCart}
+        onToggleWishlist={toggleWishlist}
+        isInWishlist={isInWishlist}
+      />
     </div>
   );
 };

@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+// Dynamic base URL - works for both localhost and IP access
+const getBaseURL = () => {
+  const hostname = window.location.hostname;
+  return `http://${hostname}:5000`;
+};
+
 const API = axios.create({
-  baseURL: 'http://localhost:5000',
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
   },

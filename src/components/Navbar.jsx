@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, Heart, User, LogOut, Moon, Sun } from 'lucide-react';
+import { Search, ShoppingCart, Heart, User, LogOut, Moon, Sun, ShoppingBag } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import {
@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { isUserAuthenticated, clearAuthData } from '../utils/auth';
 import { useSelector, useDispatch } from 'react-redux';
 import { authActionTypes } from '../redux/auth/constant';
+import MobileMenu from './MobileMenu';
 
 const Navbar = () => {
   const { cartCount } = useCart();
@@ -27,10 +28,8 @@ const Navbar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const authState = useSelector((state) => state.auth);
   
-  // Check authentication status - force re-render when auth state changes
   const [isAuthenticated, setIsAuthenticated] = useState(authState?.isAuthenticated || isUserAuthenticated());
   
-  // Update authentication status when Redux state changes
   useEffect(() => {
     setIsAuthenticated(authState?.isAuthenticated || isUserAuthenticated());
   }, [authState?.isAuthenticated]);
@@ -45,13 +44,11 @@ const Navbar = () => {
 
   const handleLogout = () => {
     clearAuthData();
-    // Dispatch logout action to update Redux state
     dispatch({ type: authActionTypes.AUTH_LOGIN_RESET });
     toast.success('Logged out successfully!', { duration: 1000 });
     navigate('/');
   };
 
-  // Check token expiration only on page load
   useEffect(() => {
     if (!isUserAuthenticated() && localStorage.getItem('token')) {
       clearAuthData();
@@ -117,9 +114,15 @@ const Navbar = () => {
                 ? 'text-orange-600 font-semibold' 
                 : isDarkMode ? 'text-white hover:text-orange-400' : 'text-gray-700 hover:text-orange-600'
             }`}>Contact</Link>
+            <Link to="/compare" className={`transition-colors font-medium ${
+              location.pathname === '/compare' 
+                ? 'text-orange-600 font-semibold' 
+                : isDarkMode ? 'text-white hover:text-orange-400' : 'text-gray-700 hover:text-orange-600'
+            }`}>Compare</Link>
           </nav>
 
           <div className="flex items-center space-x-4">
+            <MobileMenu isDarkMode={isDarkMode} />
             <Button 
               variant="ghost" 
               size="icon" 
@@ -183,20 +186,36 @@ const Navbar = () => {
                 <DropdownMenuContent align="end" className={`w-48 ${
                   isDarkMode ? 'bg-amber-800 text-white border-amber-700' : 'bg-white'
                 }`}>
+                  <DropdownMenuItem onClick={() => navigate('/dashboard')} className={`cursor-pointer ${
+                    isDarkMode ? 'hover:bg-amber-700' : 'hover:bg-gray-100'
+                  }`}>
+                    <User className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  
+                  {/* Admin Panel Link - Only visible for admin users */}
+                  {JSON.parse(localStorage.getItem('user'))?.role === 'admin' && (
+                    <DropdownMenuItem 
+                      onClick={() => window.open('/admin', '_blank')} 
+                      className={`cursor-pointer ${
+                        isDarkMode ? 'hover:bg-amber-700' : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      <ShoppingBag className="w-4 h-4 mr-2" />
+                      Admin Panel
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={() => navigate('/orders')} className={`cursor-pointer ${
+                    isDarkMode ? 'hover:bg-amber-700' : 'hover:bg-gray-100'
+                  }`}>
+                    <ShoppingBag className="w-4 h-4 mr-2" />
+                    My Orders
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={toggleDarkMode} className={`cursor-pointer ${
                     isDarkMode ? 'hover:bg-amber-700' : 'hover:bg-gray-100'
                   }`}>
-                    {isDarkMode ? (
-                      <>
-                        <Sun className="w-4 h-4 mr-2" />
-                        Light Mode
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="w-4 h-4 mr-2" />
-                        Dark Mode
-                      </>
-                    )}
+                    {isDarkMode ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
+                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className={isDarkMode ? 'bg-amber-700' : ''} />
                   <DropdownMenuItem onClick={handleLogout} className={`cursor-pointer text-red-500 ${
@@ -213,20 +232,19 @@ const Navbar = () => {
                   variant="ghost" 
                   size="icon" 
                   onClick={toggleDarkMode}
-                  className={`${
-                    isDarkMode ? 'text-white hover:bg-amber-800' : 'hover:bg-gray-100'
-                  }`}
+                  className={isDarkMode ? 'text-white hover:bg-amber-800' : 'hover:bg-gray-100'}
                 >
-                  {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                  {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </Button>
                 <Button 
                   variant="outline" 
-                  className={`${
-                    isDarkMode ? 'border-amber-600 text-white hover:bg-amber-800' : 'border-orange-300 text-orange-600 hover:bg-orange-50'
-                  }`}
                   onClick={() => navigate('/login')}
+                  className={`${
+                    isDarkMode 
+                      ? 'border-amber-600 text-white hover:bg-amber-800' 
+                      : 'border-orange-500 text-orange-600 hover:bg-orange-50'
+                  }`}
                 >
-                  <User className="w-4 h-4 mr-2" />
                   Login
                 </Button>
               </div>
